@@ -4,10 +4,15 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 export const MAX_FOTOS_DIA = 6;
-const LOCAL = !(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL);
+const LOCAL = !process.env.BLOB_READ_WRITE_TOKEN;
 const DATA = path.join(process.cwd(), '.data');
 
-/* ---------- almacenamiento de calendarios (Upstash Redis o disco en local) ---------- */
+/* ---------- almacenamiento de calendarios ----------
+   Por defecto en Vercel Blob (gratis): un JSON por calendario en una ruta imposible de adivinar
+   (cal/<id>/<hmac>.json, firmada con el token de Blob). Si hay Upstash Redis configurado, se usa Redis.
+   Sin nada configurado (local), se guarda en .data/ */
+const REDIS = !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL);
+const BLOB = !!process.env.BLOB_READ_WRITE_TOKEN;
 let redis = null;
 async function db() {
   if (redis) return redis;
@@ -18,14 +23,35 @@ async function db() {
   });
   return redis;
 }
+const rutaCal = id => `cal/${id}/${crypto.createHmac('sha256', process.env.BLOB_READ_WRITE_TOKEN).update(id).digest('hex').slice(0, 32)}.json`;
+// El token tiene la forma vercel_blob_rw_<storeId>_<secreto>
+let host = null;
+const tienda = () => (process.env.BLOB_READ_WRITE_TOKEN.match(/^vercel_blob_rw_([^_]+)_/) || [])[1];
 export async function leerCal(id) {
   if (!/^[a-z0-9]{8}$/.test(id || '')) return null;
-  if (LOCAL) { try { return JSON.parse(await fs.readFile(path.join(DATA, `cal-${id}.json`), 'utf8')); } catch { return null; } }
-  return (await (await db()).get(`cal:${id}`)) || null;
+  if (REDIS) return (await (await db()).get(`cal:${id}`)) || null;
+  if (BLOB) {
+    let r = await fetch(`https://${host || tienda().toLowerCase() + '.public.blob.vercel-storage.com'}/${rutaCal(id)}?v=${Date.now()}`, { cache: 'no-store' });
+    if (r.status === 404 && !host) {
+      // por si la URL deducida no es la buena: preguntamos a Blob dónde está
+      const { head } = await import('@vercel/blob');
+      try { const h = await head(rutaCal(id)); host = new URL(h.url).host; r = await fetch(h.url + '?v=' + Date.now(), { cache: 'no-store' }); } catch { return null; }
+    }
+    if (r.status === 404 || r.status === 403) return null;
+    if (!r.ok) throw new Error('Blob ' + r.status);
+    return r.json();
+  }
+  try { return JSON.parse(await fs.readFile(path.join(DATA, `cal-${id}.json`), 'utf8')); } catch { return null; }
 }
 export async function guardarCal(doc) {
-  if (LOCAL) { await fs.mkdir(DATA, { recursive: true }); await fs.writeFile(path.join(DATA, `cal-${doc.id}.json`), JSON.stringify(doc)); return; }
-  await (await db()).set(`cal:${doc.id}`, doc);
+  if (REDIS) { await (await db()).set(`cal:${doc.id}`, doc); return; }
+  if (BLOB) {
+    const { put } = await import('@vercel/blob');
+    const r = await put(rutaCal(doc.id), JSON.stringify(doc), { access: 'public', contentType: 'application/json', addRandomSuffix: false, allowOverwrite: true, cacheControlMaxAge: 60 });
+    host = new URL(r.url).host;
+    return;
+  }
+  await fs.mkdir(DATA, { recursive: true }); await fs.writeFile(path.join(DATA, `cal-${doc.id}.json`), JSON.stringify(doc));
 }
 
 /* ---------- archivos (Vercel Blob o disco en local) ---------- */

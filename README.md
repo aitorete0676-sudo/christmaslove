@@ -15,9 +15,10 @@ Calendario de adviento para tu pareja, pensado para el móvil. Cada persona crea
 
 ## Puesta en marcha en Vercel
 1. Importa el repo en Vercel (Framework: Other).
-2. Pestaña **Storage** → **Create** → **Upstash for Redis** (gratis) → conéctalo al proyecto.
-3. Pestaña **Storage** → **Create** → **Blob** → conéctalo al proyecto.
-4. **Deployments** → Redeploy.
+2. Pestaña **Storage** → **Create Database** → **Blob** (gratis) → conéctalo al proyecto.
+3. **Deployments** → Redeploy.
+
+Todo (calendarios y fotos) se guarda en Blob. Si además conectas Upstash Redis, los calendarios se guardan ahí.
 
 ## Local
 `npm run dev` → http://localhost:3000. Sin variables de entorno guarda todo en `.data/`.
