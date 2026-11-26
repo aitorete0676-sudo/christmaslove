@@ -7,7 +7,13 @@
 <meta name="theme-color" content="#0a1726">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/logos/icono-256.png">
-<link rel="apple-touch-icon" href="/logos/icono-256.png">
+<link rel="apple-touch-icon" href="/logos/app-180.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Christmas Love">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:light;--night:#0a1726;--night2:#16324a;--paper:#fbf3ea;--card:#fff;--ink:#21141a;--muted:#6f5d63;--red:#c8102e;--rose:#e8476a;--green:#1d5a3d;--gold:#f2c46d;--line:#ead9c8}
@@ -74,7 +80,7 @@ details.dia summary::-webkit-details-marker{display:none}
 </head>
 <body>
 <div class="top">
-  <a class="volver" href="/">‹ Inicio</a>
+  <a class="volver" href="/?lista=1">‹ Mis calendarios</a>
   <img src="/logos/icono-256.png" alt="">
   <h1>Christmas Love</h1>
   <p id="sub">Tu calendario de adviento</p>
@@ -83,7 +89,7 @@ details.dia summary::-webkit-details-marker{display:none}
 <div class="pantalla" id="error" hidden>
   <h2 id="errorT">No encuentro este calendario</h2>
   <p class="hint" id="errorX">Abre el enlace de edición que guardaste al crearlo.</p>
-  <a class="btn main" href="/">Ir al inicio</a>
+  <a class="btn main" href="/?lista=1">Ir al inicio</a>
 </div>
 
 <main id="app" hidden>
@@ -294,6 +300,7 @@ $('copiarEditar').onclick = () => copiar(linkEditar, 'Enlace de edición copiado
   pintar();
 })();
 }
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>
 </html>

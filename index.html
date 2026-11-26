@@ -9,7 +9,13 @@
 <meta property="og:description" content="Crea un calendario de adviento para tu pareja: 24 ventanas con fotos, mensajes y vídeos.">
 <meta name="theme-color" content="#0a1726">
 <link rel="icon" href="/logos/icono-256.png">
-<link rel="apple-touch-icon" href="/logos/icono-256.png">
+<link rel="apple-touch-icon" href="/logos/app-180.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Christmas Love">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 /* VOICE occasion: regalo romántico, cálido
@@ -49,6 +55,13 @@ h2{font:700 30px/1.1 "Mountains of Christmas",cursive;color:var(--green);margin:
 .pasos span{color:var(--muted);font-size:15px}
 .nota{font-size:14px;color:var(--muted);margin-top:14px}
 .err{color:var(--red);font-weight:600;min-height:1.5em}
+.instalar{margin:18px auto 0;max-width:340px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:15px;color:#d6e2ee}
+.instalar b{color:#fff4ea}
+.tengo{margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.tengo summary{cursor:pointer;font-weight:600}
+.tengo form{display:grid;gap:8px;margin-top:10px}
+.tengo label{font-size:14px;font-weight:600}
+.tengo input{font:16px "DM Sans",sans-serif;padding:11px 12px;border:1px solid #d8c4b0;border-radius:10px;width:100%}
 @media(min-width:760px){.pasos{grid-template-columns:repeat(3,1fr)}.acciones{flex-direction:row;justify-content:center}.acciones .main{width:auto}}
 </style>
 </head>
@@ -62,6 +75,11 @@ h2{font:700 30px/1.1 "Mountains of Christmas",cursive;color:var(--green);margin:
     <button class="btn main" id="crear" type="button">Crear mi calendario</button>
     <a class="btn sec" href="/c/demo">Ver un ejemplo</a>
   </div>
+  <div class="instalar" id="instalar" hidden>
+    <b>Tenla como una app</b>
+    <span id="instTxt"></span>
+    <button class="btn sec" id="instBtn" type="button" hidden>Instalar Christmas Love</button>
+  </div>
   <div class="err" id="err" role="status"></div>
 </section>
 
@@ -72,10 +90,15 @@ h2{font:700 30px/1.1 "Mountains of Christmas",cursive;color:var(--green);margin:
     <p class="nota">Se recuerdan en este móvil. Desde otro dispositivo, usa tu enlace de edición.</p>
   </div>
 
+  <details class="tengo" id="tengo">
+    <summary>Ya tengo un calendario en otro móvil</summary>
+    <form id="tengoF"><label for="tengoI">Pega tu enlace de edición</label><input id="tengoI" type="url" placeholder="https://christmaslove.vercel.app/editar/…#t=…" autocomplete="off"><button class="btn peq" type="submit">Abrir</button><div class="err" id="tengoE"></div></form>
+  </details>
+
   <h2>Cómo funciona</h2>
   <ol class="pasos">
     <li><b>Créalo</b><span>Sin registro. Tienes tu propio calendario al momento.</span></li>
-    <li><b>Rellena los 24 días</b><span>Fotos del carrete, mensajes y vídeos. Se guarda solo.</span></li>
+    <li><b>Rellénalo poco a poco</b><span>Un día hoy, otro mañana. Fotos del carrete, mensajes y vídeos. Se guarda solo.</span></li>
     <li><b>Compártelo</b><span>Le mandas un enlace por WhatsApp. Cada día se abre una ventana nueva.</span></li>
   </ol>
 </main>
@@ -86,6 +109,26 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let mis = []; try { mis = JSON.parse(localStorage.getItem('cl-mis') || '[]'); } catch (e) {}
 mis = mis.filter(x => x && /^[a-z0-9]{8}$/.test(x.id) && x.token);
+const q = new URLSearchParams(location.search);
+const app = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true || q.has('app');
+// Abierta desde la pantalla de inicio con un solo calendario: directo a editarlo
+if (app && !q.has('lista') && mis.length === 1) location.replace('/editar/' + mis[0].id);
+/* instalar en la pantalla de inicio */
+if (!app) {
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) { $('instalar').hidden = false; document.querySelector('.acciones').before($('instalar')); $('instalar').style.margin = '0 auto 18px'; $('instTxt').textContent = 'En Safari, pulsa Compartir (el cuadrado con la flecha) y luego "Añadir a pantalla de inicio". Después ábrela desde el icono y crea ahí tu calendario.'; }
+  let evInst = null;
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); evInst = e; $('instalar').hidden = false; $('instTxt').textContent = 'Instálala y ábrela desde el icono para ir rellenando tu calendario poco a poco.'; $('instBtn').hidden = false; });
+  $('instBtn').onclick = async () => { if (!evInst) return; evInst.prompt(); await evInst.userChoice; evInst = null; $('instalar').hidden = true; };
+}
+/* recuperar un calendario con el enlace de edición */
+$('tengoF').onsubmit = e => {
+  e.preventDefault();
+  const m = $('tengoI').value.trim().match(/\/editar\/([a-z0-9]{8})#t=([a-f0-9]{48})/);
+  if (!m) { $('tengoE').textContent = 'Ese enlace no parece un enlace de edición.'; return; }
+  try { const l = JSON.parse(localStorage.getItem('cl-mis') || '[]').filter(x => x.id !== m[1]); l.unshift({id: m[1], token: m[2], creado: Date.now()}); localStorage.setItem('cl-mis', JSON.stringify(l)); } catch (er) {}
+  location.href = '/editar/' + m[1];
+};
 if (mis.length) {
   $('misBox').hidden = false;
   $('mis').innerHTML = mis.map(x => `<div class="cal"><span class="ic">♥</span><span class="t"><b>${esc(x.para ? 'Para ' + x.para : 'Sin nombre todavía')}</b><small>Creado el ${new Date(x.creado || Date.now()).toLocaleDateString('es-ES', {day: 'numeric', month: 'long'})}</small></span><span class="bs"><a class="btn peq" href="/editar/${x.id}">Editar</a></span></div>`).join('');
@@ -107,6 +150,7 @@ function tam() { const r = devicePixelRatio || 1; W = cv.clientWidth; H = cv.cli
 function f(t) { cx.clearRect(0, 0, W, H); cx.fillStyle = 'rgba(255,255,255,.8)'; for (const p of P) { p.y += p.v; p.x += Math.sin(t / 1500 + p.o) * .3; if (p.y > H + 5) { p.y = -5; p.x = Math.random() * W; } cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill(); } if (motion) requestAnimationFrame(f); }
 addEventListener('resize', tam); tam(); requestAnimationFrame(f);
 }
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>
 </html>
