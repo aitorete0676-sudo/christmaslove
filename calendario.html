@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Christmas Love</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0a1726">
+<link rel="icon" href="logos/icono-256.png">
+<link rel="apple-touch-icon" href="logos/icono-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Mountains+of+Christmas:wght@700&family=Cormorant+Garamond:wght@500;700&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE occasion, íntimo y romántico
+   IDEA un calendario de adviento de cartón de verdad: puertas de colores que se abren con bisagra
+   PICTURE la propia rejilla de 24 puertas bajo una noche nevada con corazones
+   COLOUR noche vino #1c0710, vino #7a1630, verde abeto #1d5a3d, crema #f6e7d7, rosa #e8476a, oro #f2c46d
+   TYPE Great Vibes para el título + Cormorant para números + DM Sans para texto
+   LAYOUT título arriba, línea de estado, rejilla 4 col en móvil y 6 en pantalla ancha */
+:root{color-scheme:dark;--bg:#0a1726;--bg2:#16324a;--wine:#7a1630;--green:#1d5a3d;--cream:#f6e7d7;--rose:#e8476a;--gold:#f2c46d;--ink:#fff4ea;--muted:#e3c3c9}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg) 70%) fixed,var(--bg);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100svh;overflow-x:clip}
+#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding-top:calc(env(safe-area-inset-top,0px) + 28px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px);padding-left:max(4vw,16px,env(safe-area-inset-left,0px));padding-right:max(4vw,16px,env(safe-area-inset-right,0px))}
+header{text-align:center;margin-bottom:22px}
+h1{font:700 clamp(48px,12vw,96px)/1.05 "Mountains of Christmas",cursive;margin:0;color:var(--ink);text-shadow:0 2px 24px rgba(242,196,109,.35)}
+.para{font:500 clamp(19px,4.6vw,24px)/1.3 "Cormorant Garamond",serif;color:var(--muted);margin:6px 0 0}
+.estado{display:inline-block;margin-top:16px;padding:8px 18px;border:1px solid rgba(242,196,109,.5);border-radius:999px;color:var(--gold);font-weight:600;font-size:15px;background:rgba(0,0,0,.2)}
+.prueba{margin-top:10px;font-size:13px;color:#ffd0da}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(84px,22vw);grid-auto-flow:dense;gap:10px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:120px;gap:14px}.cell.w2b{grid-column:span 2}}
+.cell{position:relative;border:0;padding:0;background:transparent;perspective:900px;cursor:pointer;font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+.cell.w2{grid-column:span 2}
+.cell.big{grid-column:span 2;grid-row:span 2}
+.behind{position:absolute;inset:0;border-radius:12px;background:radial-gradient(circle at 50% 45%,#ffe9ef,#f3b7c5);box-shadow:inset 0 4px 14px rgba(90,10,30,.45);display:grid;place-items:center}
+.behind svg{width:40%;max-width:70px;fill:var(--rose)}
+.door{position:absolute;inset:0;border-radius:12px;transform-origin:left center;transition:transform .9s cubic-bezier(.3,.7,.2,1),box-shadow .9s;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.12)}
+.door::before{content:"";position:absolute;inset:6px;border:1px solid rgba(242,196,109,.55);border-radius:8px}
+.door::after{content:"";position:absolute;right:9px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--gold);transform:translateY(-50%)}
+.c0 .door{background:linear-gradient(150deg,#8c1b39,#62102a)}
+.c1 .door{background:linear-gradient(150deg,#22694a,#144330)}
+.c2 .door{background:linear-gradient(150deg,#fbefe3,#ecd6c1);color:#7a1630}
+.c3 .door{background:linear-gradient(150deg,#e1506f,#b52c4e)}
+.num{position:relative;font:700 clamp(30px,8vw,46px)/1 "Cormorant Garamond",serif;font-variant-numeric:lining-nums}
+.big .num{font-size:clamp(56px,16vw,88px)}
+.orn{position:absolute;left:12px;top:10px;width:18px;height:18px;opacity:.7;fill:currentColor}
+.lock{position:absolute;right:12px;bottom:10px;width:13px;height:13px;opacity:.55;fill:currentColor}
+.cell.locked .door{filter:saturate(.75) brightness(.86)}
+.cell.today .door{box-shadow:0 0 0 2px var(--gold),0 0 26px 4px rgba(242,196,109,.55)}
+.cell.today .door{animation:glow 2.2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 2px var(--gold),0 0 40px 10px rgba(242,196,109,.75)}}
+.cell.opened .door{transform:rotateY(-72deg);box-shadow:-8px 6px 14px rgba(0,0,0,.4)}
+.cell.opening .door{transform:rotateY(-110deg)}
+.cell:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:12px}
+.cell.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translate(-50%,30px);opacity:0;background:var(--cream);color:#5b0f24;padding:12px 20px;border-radius:999px;font-weight:600;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:.35s;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+footer{text-align:center;margin-top:28px;color:var(--muted);font:500 18px "Cormorant Garamond",serif}
+/* ventana abierta */
+.modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(5,12,22,.75);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity .35s}
+.modal.show{opacity:1}
+.sheet{position:relative;width:min(640px,100%);max-height:calc(100svh - 32px);overflow:auto;background:var(--cream);color:#3b0a18;border-radius:20px;padding:26px 22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.5);transform:scale(.85) translateY(20px);transition:transform .45s cubic-bezier(.2,1.3,.4,1)}
+.modal.show .sheet{transform:none}
+.sheet::before{content:"";position:absolute;inset:8px;border:1px solid rgba(201,149,47,.6);border-radius:14px;pointer-events:none}
+.fecha{font:700 15px/1 "Cormorant Garamond",serif;letter-spacing:.04em;color:#9b3550;text-align:center}
+.sheet h2{font:700 clamp(32px,8vw,46px)/1.1 "Mountains of Christmas",cursive;margin:8px 0 14px;text-align:center;color:#7a1630}
+.texto{white-space:pre-wrap;font-size:17px;margin:0 0 16px}
+.fotos{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -4px 16px;padding:0 4px 6px}
+.fotos img{flex:0 0 auto;width:100%;max-height:60svh;object-fit:cover;border-radius:12px;scroll-snap-align:center;background:#ead2c0}
+.fotos.multi img{width:86%}
+.video{position:relative;margin-bottom:16px;border-radius:12px;overflow:hidden;background:#000}
+.video video{display:block;width:100%;max-height:60svh}
+.video.yt{aspect-ratio:16/9}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cerrar{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:#7a1630;color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
+.firma{text-align:right;font:400 30px "Great Vibes",cursive;color:#7a1630;margin:0}
+.heart{position:fixed;z-index:25;pointer-events:none;width:22px;height:22px;fill:var(--rose)}
+@media(prefers-reduced-motion:reduce){.door,.sheet,.modal{transition:none}.cell.today .door{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="snow"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="-17 -15 34 34"><path d="M0,-6 C-4,-14 -16,-12 -16,-3 C-16,6 -6,12 0,18 C6,12 16,6 16,-3 C16,-12 4,-14 0,-6Z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 1l3 8h8l-6.5 5 2.5 8-7-5-7 5 2.5-8L1 9h8z"/></symbol>
+  <symbol id="i-flake" viewBox="0 0 24 24"><path d="M11 1h2v22h-2zM1 11h22v2H1zM3.5 4.9l1.4-1.4 15.6 15.6-1.4 1.4zM19.1 3.5l1.4 1.4L4.9 20.5l-1.4-1.4z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 2c-4 0-6 3-6 7v5l-2 3h16l-2-3V9c0-4-2-7-6-7zm-2 17a2 2 0 004 0z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0112 0v3h1v13H5V10zm3 0h6V7a3 3 0 00-6 0z"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header>
+    <h1>Christmas Love</h1>
+    <p class="para" id="para"></p>
+    <div class="estado" id="estado"></div>
+    <div class="prueba" id="prueba" hidden>Modo prueba: todas las ventanas están abiertas.</div>
+  </header>
+  <main class="grid" id="grid" aria-label="Calendario de adviento"></main>
+  <footer id="pie"></footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="contenido.js"></script>
+<script>
+{
+const C = window.CHRISTMAS_LOVE || {dias:{}};
+const ANIO = C.anio || 2026;
+const ORDEN = [7,15,1,20,11,4,18,9,24,13,2,22,6,16,10,21,3,14,8,19,12,5,23,17];
+const ORN = ['i-heart','i-flake','i-star','i-bell'];
+const MESES = 'enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre'.split(' ');
+const $ = id => document.getElementById(id);
+const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let prueba = !!C.modoPrueba;
+try { const q = new URLSearchParams(location.search).get('prueba'); if (q && C.clavePrueba && q === C.clavePrueba) prueba = true; } catch (e) {}
+
+function hoyMadrid() {
+  const p = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Madrid', year:'numeric', month:'2-digit', day:'2-digit'}).formatToParts(new Date());
+  const g = t => +p.find(x => x.type === t).value;
+  return {y:g('year'), m:g('month'), d:g('day')};
+}
+function abierta(n, h) { return prueba || h.y > ANIO || (h.y === ANIO && h.m === 12 && h.d >= n); }
+
+let vistas = [];
+try { vistas = JSON.parse(localStorage.getItem('cl-vistas-' + ANIO) || '[]'); } catch (e) {}
+function guardarVista(n) { if (!vistas.includes(n)) vistas.push(n); try { localStorage.setItem('cl-vistas-' + ANIO, JSON.stringify(vistas)); } catch (e) {} }
+
+function estado(h) {
+  if (prueba) return 'Vista previa';
+  if (h.y < ANIO || (h.y === ANIO && h.m < 12)) {
+    const falta = Math.round((Date.UTC(ANIO, 11, 1) - Date.UTC(h.y, h.m - 1, h.d)) / 864e5);
+    return falta === 1 ? 'Mañana se abre la primera ventana' : 'Faltan ' + falta + ' días para la primera ventana';
+  }
+  if (h.y === ANIO && h.d <= 24) return h.d === 24 ? 'Hoy se abre la última ventana' : 'Hoy se abre la ventana ' + h.d;
+  return 'Todas las ventanas están abiertas';
+}
+
+let diaPintado = '';
+function pintar() {
+  const h = hoyMadrid(); diaPintado = h.y + '-' + h.m + '-' + h.d;
+  $('para').textContent = (C.para ? 'Para ' + C.para : '') + (C.de ? ', de ' + C.de : '');
+  $('estado').textContent = estado(h);
+  $('prueba').hidden = !prueba;
+  $('pie').textContent = C.pie || '';
+  $('grid').innerHTML = ORDEN.map((n, i) => {
+    const ok = abierta(n, h), hoy = !prueba && h.y === ANIO && h.m === 12 && h.d === n;
+    const cls = ['cell', 'c' + (i % 4), n === 24 ? 'big' : '', n === 1 ? 'w2' : '', (n === 13 || n === 18) ? 'w2b' : '', ok ? '' : 'locked', hoy ? 'today' : '', ok && vistas.includes(n) ? 'opened' : ''].join(' ');
+    return `<button class="${cls}" data-n="${n}" aria-label="Día ${n}${ok ? '' : ', cerrada'}">
+      <span class="behind"><svg viewBox="-17 -15 34 34"><use href="#i-heart"/></svg></span>
+      <span class="door"><svg class="orn"><use href="#${ORN[n % 4]}"/></svg><span class="num">${n}</span>${ok ? '' : '<svg class="lock"><use href="#i-lock"/></svg>'}</span>
+    </button>`;
+  }).join('');
+}
+
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2600); }
+
+function corazones(x, y, n) {
+  if (!motion) return;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '-17 -15 34 34'); s.setAttribute('class', 'heart');
+    s.innerHTML = '<use href="#i-heart"/>';
+    s.style.left = (x - 11) + 'px'; s.style.top = (y - 11) + 'px';
+    s.style.fill = ['#e8476a', '#ff8fa3', '#f2c46d', '#c8102e'][i % 4];
+    document.body.appendChild(s);
+    const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 160, sc = .6 + Math.random() * .9;
+    s.animate([{transform: 'translate(0,0) scale(.2)', opacity: 1}, {transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 80}px) scale(${sc}) rotate(${(Math.random() - .5) * 60}deg)`, opacity: 0}], {duration: 1100 + Math.random() * 700, easing: 'cubic-bezier(.2,.8,.3,1)'}).onfinish = () => s.remove();
+  }
+}
+
+function ytId(u) { const m = String(u).match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/); return m && m[1]; }
+
+function abrirModal(n) {
+  const d = (C.dias && C.dias[n]) || {};
+  const m = document.createElement('div'); m.className = 'modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
+  const sh = document.createElement('div'); sh.className = 'sheet'; m.appendChild(sh);
+  const x = document.createElement('button'); x.className = 'cerrar'; x.setAttribute('aria-label', 'Cerrar'); x.textContent = '×'; sh.appendChild(x);
+  const f = document.createElement('div'); f.className = 'fecha'; f.textContent = 'Día ' + n + ' · ' + n + ' de ' + MESES[11]; sh.appendChild(f);
+  const t = document.createElement('h2'); t.textContent = d.titulo || 'Día ' + n; sh.appendChild(t);
+  const fotos = (d.fotos || []).filter(Boolean);
+  if (fotos.length) {
+    const g = document.createElement('div'); g.className = 'fotos' + (fotos.length > 1 ? ' multi' : '');
+    fotos.forEach(src => { const im = new Image(); im.src = src; im.alt = 'Foto del día ' + n; im.loading = 'lazy'; im.onerror = () => im.remove(); g.appendChild(im); });
+    sh.appendChild(g);
+  }
+  if (d.texto || !(fotos.length || d.video)) { const p = document.createElement('p'); p.className = 'texto'; p.textContent = d.texto || 'Esta sorpresa todavía se está preparando. Vuelve en un rato.'; sh.appendChild(p); }
+  if (d.video) {
+    const v = document.createElement('div'); v.className = 'video'; const id = ytId(d.video);
+    if (id) { v.classList.add('yt'); const fr = document.createElement('iframe'); fr.src = 'https://www.youtube-nocookie.com/embed/' + id; fr.allow = 'autoplay; encrypted-media; picture-in-picture'; fr.allowFullscreen = true; fr.title = 'Vídeo del día ' + n; v.appendChild(fr); }
+    else { const vd = document.createElement('video'); vd.src = d.video; vd.controls = true; vd.playsInline = true; vd.preload = 'metadata'; v.appendChild(vd); }
+    sh.appendChild(v);
+  }
+  if (C.de) { const fi = document.createElement('p'); fi.className = 'firma'; fi.textContent = C.de; sh.appendChild(fi); }
+  const cerrar = () => { m.classList.remove('show'); setTimeout(() => m.remove(), 350); document.removeEventListener('keydown', esc); };
+  const esc = e => { if (e.key === 'Escape') cerrar(); };
+  x.onclick = cerrar; m.onclick = e => { if (e.target === m) cerrar(); };
+  document.addEventListener('keydown', esc);
+  document.body.appendChild(m); requestAnimationFrame(() => m.classList.add('show')); x.focus({preventScroll: true});
+}
+
+$('grid').addEventListener('click', e => {
+  const b = e.target.closest('.cell'); if (!b) return;
+  const n = +b.dataset.n, h = hoyMadrid();
+  if (!abierta(n, h)) {
+    b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+    toast(n === 1 && h.m < 12 ? 'Paciencia… empieza el 1 de diciembre' : 'Paciencia, se abre el ' + n + ' de diciembre');
+    return;
+  }
+  const r = b.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  if (b.classList.contains('opened')) { corazones(cx, cy, 10); abrirModal(n); return; }
+  b.classList.add('opening'); corazones(cx, cy, 22); guardarVista(n);
+  setTimeout(() => { b.classList.remove('opening'); b.classList.add('opened'); abrirModal(n); }, motion ? 750 : 0);
+});
+
+/* nieve y corazones cayendo */
+const cv = $('snow'), cx = cv.getContext('2d'); let W, H, copos = [];
+function tam() { const r = devicePixelRatio || 1; W = innerWidth; H = innerHeight; cv.width = W * r; cv.height = H * r; cx.setTransform(r, 0, 0, r, 0, 0);
+  copos = Array.from({length: Math.min(140, Math.round(W * H / 9000))}, () => ({x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2.4 + .6, v: Math.random() * .6 + .3, o: Math.random() * 6, c: Math.random() < .08})); }
+function corazon(x, y, s) { cx.beginPath(); cx.moveTo(x, y + s * .3); cx.bezierCurveTo(x - s, y - s * .5, x - s * .4, y - s * 1.2, x, y - s * .45); cx.bezierCurveTo(x + s * .4, y - s * 1.2, x + s, y - s * .5, x, y + s * .3); cx.fill(); }
+function nieve(t) {
+  cx.clearRect(0, 0, W, H);
+  for (const p of copos) {
+    p.y += p.v; p.x += Math.sin(t / 1600 + p.o) * .35;
+    if (p.y > H + 10) { p.y = -10; p.x = Math.random() * W; }
+    if (p.c) { cx.fillStyle = 'rgba(232,71,106,.7)'; corazon(p.x, p.y, p.r * 3.2); }
+    else { cx.fillStyle = 'rgba(255,255,255,.8)'; cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill(); }
+  }
+  if (motion) requestAnimationFrame(nieve);
+}
+addEventListener('resize', tam); tam(); requestAnimationFrame(nieve);
+
+pintar();
+setInterval(() => { const h = hoyMadrid(); if (h.y + '-' + h.m + '-' + h.d !== diaPintado) pintar(); }, 60000);
+}
+</script>
+</body>
+</html>
