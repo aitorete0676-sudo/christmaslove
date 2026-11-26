@@ -29,8 +29,19 @@ let host = null;
 const tienda = () => (process.env.BLOB_READ_WRITE_TOKEN.match(/^vercel_blob_rw_([^_]+)_/) || [])[1];
 export async function leerCal(id) {
   if (!/^[a-z0-9]{8}$/.test(id || '')) return null;
-  if (REDIS) return (await (await db()).get(`cal:${id}`)) || null;
-  if (BLOB) {
+  if (REDIS) {
+    const d = await (await db()).get(`cal:${id}`);
+    if (d || !BLOB) return d || null;
+    // calendarios creados antes de conectar Redis: se leen de Blob y se pasan a Redis
+    const viejo = await leerBlob(id).catch(() => null);
+    if (viejo) await (await db()).set(`cal:${id}`, viejo);
+    return viejo;
+  }
+  if (BLOB) return leerBlob(id);
+  try { return JSON.parse(await fs.readFile(path.join(DATA, `cal-${id}.json`), 'utf8')); } catch { return null; }
+}
+async function leerBlob(id) {
+  {
     let r = await fetch(`https://${host || tienda().toLowerCase() + '.public.blob.vercel-storage.com'}/${rutaCal(id)}?v=${Date.now()}`, { cache: 'no-store' });
     if (r.status === 404 && !host) {
       // por si la URL deducida no es la buena: preguntamos a Blob dónde está
@@ -41,7 +52,6 @@ export async function leerCal(id) {
     if (!r.ok) throw new Error('Blob ' + r.status);
     return r.json();
   }
-  try { return JSON.parse(await fs.readFile(path.join(DATA, `cal-${id}.json`), 'utf8')); } catch { return null; }
 }
 export async function guardarCal(doc) {
   if (REDIS) { await (await db()).set(`cal:${doc.id}`, doc); return; }
