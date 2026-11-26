@@ -58,6 +58,7 @@ details.dia summary::-webkit-details-marker{display:none}
 .file{position:relative;overflow:hidden}
 .file input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
 .vid{margin-top:8px;font-size:14px;color:var(--muted)}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .o{display:flex;align-items:center;gap:10px;margin:12px 0 8px;color:var(--muted);font-size:13px}
 .o::before,.o::after{content:"";flex:1;height:1px;background:var(--line)}
 .enlace{display:flex;gap:8px;margin:6px 0 4px}
@@ -204,7 +205,7 @@ function pintar() {
         <div class="field"><label for="x${n}">Mensaje</label><textarea id="x${n}" data-k="texto" maxlength="3000" placeholder="Lo que quieras que lea ese día">${esc(d.texto)}</textarea></div>
         <label>Fotos (hasta ${MAX_FOTOS})</label>
         <div class="thumbs"></div>
-        <span class="btn file verde" style="width:100%">Añadir fotos<input type="file" accept="image/*" multiple data-fotos aria-label="Añadir fotos del día ${n}"></span>
+        <div class="dos"><span class="btn file verde">Añadir fotos<input type="file" accept="image/*" multiple data-fotos aria-label="Añadir fotos del día ${n}"></span><button type="button" class="btn" data-pegar>Pegar foto</button></div>
         <div class="o">vídeo (opcional)</div>
         <div class="field"><label for="v${n}">Enlace de YouTube</label><input type="url" id="v${n}" data-k="video" value="${esc(yt)}" placeholder="https://youtu.be/…" inputmode="url"></div>
         <span class="btn file" style="width:100%">O subir un vídeo del carrete (máx. 150 MB)<input type="file" accept="video/*" data-video aria-label="Subir vídeo del día ${n}"></span>
@@ -242,20 +243,38 @@ $('dias').addEventListener('input', e => {
   if (k === 'video') pintarVideo(n);
   pintarCab(n); progreso(); guardar();
 });
+async function anadirFotos(n, files) {
+  files = files.filter(f => /^image\//.test(f.type));
+  if (!files.length) { toast('No hay ninguna foto para añadir', true); return; }
+  const hueco = MAX_FOTOS - S.dias[n].fotos.length;
+  if (files.length > hueco) { toast('Máximo ' + MAX_FOTOS + ' fotos por día', true); files = files.slice(0, Math.max(0, hueco)); }
+  let quedan = files.length, fallos = 0; pintarFotos(n, quedan);
+  for (const f of files) {
+    try { S.dias[n].fotos.push(await subir(await comprimir(f), 'image/jpeg')); } catch (er) { fallos++; }
+    quedan--; pintarFotos(n, quedan);
+  }
+  pintarCab(n); progreso(); guardar();
+  if (files.length) toast(fallos ? fallos + ' foto(s) no se pudieron subir' : (files.length > 1 ? 'Fotos añadidas' : 'Foto añadida'), !!fallos);
+}
+/* pegar fotos copiadas (desde la app Fotos: Copiar, y aquí Pegar foto) */
+async function pegarFoto(n) {
+  if (!navigator.clipboard || !navigator.clipboard.read) { toast('Mantén pulsado el mensaje y elige Pegar', true); return; }
+  try {
+    const items = await navigator.clipboard.read(), files = [];
+    for (const it of items) { const t = it.types.find(x => x.startsWith('image/')); if (t) { const b = await it.getType(t); files.push(new File([b], 'pegada', {type: t})); } }
+    if (!files.length) { toast('No hay ninguna foto copiada. En Fotos, pulsa Compartir y luego Copiar.', true); return; }
+    await anadirFotos(n, files);
+  } catch (er) { toast('No pude leer el portapapeles. Pulsa "Pegar" cuando te lo pida.', true); }
+}
+$('dias').addEventListener('paste', e => {
+  const n = +(e.target.closest('details') || {dataset: {}}).dataset.n; if (!n) return;
+  const files = [...(e.clipboardData && e.clipboardData.files || [])].filter(f => /^image\//.test(f.type));
+  if (!files.length) return;
+  e.preventDefault(); anadirFotos(n, files);
+});
 $('dias').addEventListener('change', async e => {
   const n = +(e.target.closest('details') || {dataset: {}}).dataset.n; if (!n) return;
-  if (e.target.matches('[data-fotos]')) {
-    let files = [...e.target.files]; e.target.value = '';
-    const hueco = MAX_FOTOS - S.dias[n].fotos.length;
-    if (files.length > hueco) { toast('Máximo ' + MAX_FOTOS + ' fotos por día', true); files = files.slice(0, Math.max(0, hueco)); }
-    let quedan = files.length, fallos = 0; pintarFotos(n, quedan);
-    for (const f of files) {
-      try { S.dias[n].fotos.push(await subir(await comprimir(f), 'image/jpeg')); } catch (er) { fallos++; }
-      quedan--; pintarFotos(n, quedan);
-    }
-    pintarCab(n); progreso(); guardar();
-    if (files.length) toast(fallos ? fallos + ' foto(s) no se pudieron subir' : 'Fotos añadidas', !!fallos);
-  }
+  if (e.target.matches('[data-fotos]')) { const fs = [...e.target.files]; e.target.value = ''; await anadirFotos(n, fs); }
   if (e.target.matches('[data-video]')) {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     if (f.size > MAX_VIDEO) { toast('Pesa ' + (f.size / 1048576).toFixed(0) + ' MB (máx. 150). Recórtalo o súbelo a YouTube como oculto.', true); return; }
@@ -280,6 +299,7 @@ $('dias').addEventListener('change', async e => {
 });
 $('dias').addEventListener('click', e => {
   const n = +(e.target.closest('details') || {dataset: {}}).dataset.n; if (!n) return;
+  if (e.target.hasAttribute('data-pegar')) { pegarFoto(n); return; }
   if (e.target.dataset.quitar !== undefined) { S.dias[n].fotos.splice(+e.target.dataset.quitar, 1); pintarFotos(n); }
   else if (e.target.hasAttribute('data-quitarvid')) { S.dias[n].video = ''; pintarVideo(n); }
   else return;
