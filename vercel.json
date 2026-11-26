@@ -1,7 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/c/:id", "destination": "/c.html" },
-    { "source": "/editar/:id", "destination": "/editar.html" }
+    { "source": "/c/:id", "destination": "/c" },
+    { "source": "/editar/:id", "destination": "/editar" }
   ]
 }
