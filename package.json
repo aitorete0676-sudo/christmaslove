@@ -1,0 +1,13 @@
+{
+  "name": "christmaslove",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs"
+  },
+  "dependencies": {
+    "@upstash/redis": "1.41.1",
+    "@vercel/blob": "2.9.0"
+  },
+  "engines": { "node": ">=20" }
+}

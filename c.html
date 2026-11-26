@@ -6,8 +6,10 @@
 <title>Christmas Love</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#0a1726">
-<link rel="icon" href="logos/icono-256.png">
-<link rel="apple-touch-icon" href="logos/icono-256.png">
+<link rel="icon" href="/logos/icono-256.png">
+<meta property="og:title" content="Christmas Love">
+<meta property="og:description" content="Tengo algo para ti. Abre una ventana cada día hasta Navidad.">
+<link rel="apple-touch-icon" href="/logos/icono-256.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Mountains+of+Christmas:wght@700&family=Cormorant+Garamond:wght@500;700&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -95,40 +97,39 @@ footer{text-align:center;margin-top:28px;color:var(--muted);font:500 18px "Cormo
     <h1>Christmas Love</h1>
     <p class="para" id="para"></p>
     <div class="estado" id="estado"></div>
-    <div class="prueba" id="prueba" hidden>Modo prueba: todas las ventanas están abiertas.</div>
+    <div class="prueba" id="prueba" hidden>Ella verá cada ventana cerrada hasta su día.</div>
   </header>
   <main class="grid" id="grid" aria-label="Calendario de adviento"></main>
   <footer id="pie"></footer>
 </div>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="contenido.js"></script>
 <script>
 {
-const C = window.CHRISTMAS_LOVE || {dias:{}};
-const ANIO = C.anio || 2026;
+const ID = location.pathname.split('/').filter(Boolean).pop() || 'demo';
+let TOKEN = ''; try { TOKEN = new URLSearchParams(location.hash.slice(1)).get('t') || ''; } catch (e) {}
+let C = {dias:{}}, ANIO = 2026, ABIERTAS = new Set();
 const ORDEN = [7,15,1,20,11,4,18,9,24,13,2,22,6,16,10,21,3,14,8,19,12,5,23,17];
 const ORN = ['i-heart','i-flake','i-star','i-bell'];
 const MESES = 'enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre'.split(' ');
 const $ = id => document.getElementById(id);
 const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-let prueba = !!C.modoPrueba;
-try { const q = new URLSearchParams(location.search).get('prueba'); if (q && C.clavePrueba && q === C.clavePrueba) prueba = true; } catch (e) {}
+let prueba = false;
 
 function hoyMadrid() {
   const p = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Madrid', year:'numeric', month:'2-digit', day:'2-digit'}).formatToParts(new Date());
   const g = t => +p.find(x => x.type === t).value;
   return {y:g('year'), m:g('month'), d:g('day')};
 }
-function abierta(n, h) { return prueba || h.y > ANIO || (h.y === ANIO && h.m === 12 && h.d >= n); }
+function abierta(n) { return prueba || ABIERTAS.has(n); }
 
 let vistas = [];
-try { vistas = JSON.parse(localStorage.getItem('cl-vistas-' + ANIO) || '[]'); } catch (e) {}
-function guardarVista(n) { if (!vistas.includes(n)) vistas.push(n); try { localStorage.setItem('cl-vistas-' + ANIO, JSON.stringify(vistas)); } catch (e) {} }
+function leerVistas() { try { vistas = JSON.parse(localStorage.getItem('cl-vistas-' + ID) || '[]'); } catch (e) {} }
+function guardarVista(n) { if (prueba) return; if (!vistas.includes(n)) vistas.push(n); try { localStorage.setItem('cl-vistas-' + ID, JSON.stringify(vistas)); } catch (e) {} }
 
 function estado(h) {
-  if (prueba) return 'Vista previa';
+  if (prueba) return ID === 'demo' ? 'Demo: todas abiertas' : 'Vista previa: solo tú lo ves todo';
   if (h.y < ANIO || (h.y === ANIO && h.m < 12)) {
     const falta = Math.round((Date.UTC(ANIO, 11, 1) - Date.UTC(h.y, h.m - 1, h.d)) / 864e5);
     return falta === 1 ? 'Mañana se abre la primera ventana' : 'Faltan ' + falta + ' días para la primera ventana';
@@ -142,7 +143,7 @@ function pintar() {
   const h = hoyMadrid(); diaPintado = h.y + '-' + h.m + '-' + h.d;
   $('para').textContent = (C.para ? 'Para ' + C.para : '') + (C.de ? ', de ' + C.de : '');
   $('estado').textContent = estado(h);
-  $('prueba').hidden = !prueba;
+  $('prueba').hidden = !(prueba && ID !== 'demo');
   $('pie').textContent = C.pie || '';
   $('grid').innerHTML = ORDEN.map((n, i) => {
     const ok = abierta(n, h), hoy = !prueba && h.y === ANIO && h.m === 12 && h.d === n;
@@ -231,8 +232,20 @@ function nieve(t) {
 }
 addEventListener('resize', tam); tam(); requestAnimationFrame(nieve);
 
-pintar();
-setInterval(() => { const h = hoyMadrid(); if (h.y + '-' + h.m + '-' + h.d !== diaPintado) pintar(); }, 60000);
+async function cargar() {
+  try {
+    const r = await fetch('/api/ver?id=' + encodeURIComponent(ID), {headers: TOKEN ? {'x-token': TOKEN} : {}, cache: 'no-store'});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Error');
+    C = d; ANIO = d.anio || 2026; ABIERTAS = new Set(d.abiertas || []); prueba = !!d.todo;
+    leerVistas(); pintar();
+  } catch (e) {
+    $('estado').textContent = e.message === 'Este calendario no existe' ? 'Este calendario no existe' : 'No se pudo cargar. Revisa la conexión.';
+  }
+}
+$('estado').textContent = 'Cargando…';
+cargar();
+setInterval(() => { const h = hoyMadrid(); if (h.y + '-' + h.m + '-' + h.d !== diaPintado) cargar(); }, 60000);
 }
 </script>
 </body>

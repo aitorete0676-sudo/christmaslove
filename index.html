@@ -3,274 +3,109 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Crea tu Christmas Love</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<title>Christmas Love</title>
+<meta name="description" content="Crea un calendario de adviento para tu pareja: 24 ventanas con fotos, mensajes y vídeos que se abren cada día de diciembre.">
+<meta property="og:title" content="Christmas Love">
+<meta property="og:description" content="Crea un calendario de adviento para tu pareja: 24 ventanas con fotos, mensajes y vídeos.">
 <meta name="theme-color" content="#0a1726">
-<link rel="icon" href="logos/icono-256.png">
-<link rel="apple-touch-icon" href="logos/icono-256.png">
+<link rel="icon" href="/logos/icono-256.png">
+<link rel="apple-touch-icon" href="/logos/icono-256.png">
 <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* VOICE occasion, pero herramienta: claro y cálido
-   IDEA el taller de Christmas Love: rellenas las 24 puertas una a una
-   PICTURE la lista de 24 puertas, cada una con su número de color y su estado
-   COLOUR noche #0a1726, papel crema #fbf3ea, rojo #c8102e, verde #1d5a3d, oro #f2c46d
-   TYPE Mountains of Christmas para títulos + DM Sans
-   LAYOUT una columna de 760px; barra fija abajo con progreso, vista previa y descarga */
-:root{color-scheme:light;--night:#0a1726;--night2:#16324a;--paper:#fbf3ea;--card:#fff;--ink:#21141a;--muted:#6f5d63;--red:#c8102e;--rose:#e8476a;--green:#1d5a3d;--gold:#f2c46d;--line:#ead9c8}
+/* VOICE occasion: regalo romántico, cálido
+   IDEA la portada de una caja de regalo: logo grande, una promesa, un botón
+   PICTURE el árbol de corazones nevado (logo) sobre la noche, con nieve
+   COLOUR noche #0a1726, crema #fbf3ea, rojo #c8102e, verde #1d5a3d, oro #f2c46d
+   TYPE Mountains of Christmas + DM Sans
+   LAYOUT móvil: logo, título, botón, demo; debajo mis calendarios y 3 pasos */
+:root{color-scheme:light;--night:#0a1726;--night2:#16324a;--paper:#fbf3ea;--ink:#21141a;--muted:#6f5d63;--red:#c8102e;--green:#1d5a3d;--gold:#f2c46d;--line:#ead9c8}
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0}
-body{background:var(--paper);color:var(--ink);font:16px/1.5 "DM Sans",system-ui,sans-serif;overflow-x:clip;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-.top{background:radial-gradient(120% 120% at 50% 0%,var(--night2),var(--night));color:#fff4ea;margin-top:calc(-1*env(safe-area-inset-top,0px));padding:calc(env(safe-area-inset-top,0px) + 28px) max(5vw,16px) 26px;text-align:center}
-.top img{width:72px;height:72px;border-radius:18px;display:block;margin:0 auto 8px}
-h1{font:700 clamp(40px,10vw,64px)/1.05 "Mountains of Christmas",cursive;margin:0}
-.top p{margin:6px auto 0;max-width:34em;color:#d6e2ee}
-main{max-width:760px;margin:0 auto;padding:0 max(4vw,16px)}
-h2{font:700 30px/1.1 "Mountains of Christmas",cursive;margin:30px 0 4px;color:var(--green)}
-.hint{color:var(--muted);margin:0 0 14px;font-size:15px}
-.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:560px){.row{grid-template-columns:1fr}}
-label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
-input[type=text],input[type=url],textarea{width:100%;font:16px/1.4 "DM Sans",sans-serif;padding:10px 12px;border:1px solid #d8c4b0;border-radius:10px;background:#fffdfa;color:var(--ink)}
-textarea{min-height:96px;resize:vertical}
-input:focus,textarea:focus{outline:2px solid var(--gold);border-color:var(--gold)}
-.field{margin-bottom:12px}
-details.dia{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
-details.dia summary{list-style:none;display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer}
-details.dia summary::-webkit-details-marker{display:none}
-.n{flex:0 0 46px;height:46px;border-radius:10px;display:grid;place-items:center;color:#fff;font:700 22px "DM Sans";box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
-.d0 .n{background:#7a1630}.d1 .n{background:var(--green)}.d2 .n{background:#e9d6c2;color:#7a1630}.d3 .n{background:var(--rose)}
-.st{flex:1}
-.st b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.st small{color:var(--muted);font-size:13px}
-.ok{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--green);background:#e3f0e8;border-radius:999px;padding:3px 10px}
-.ok.vacio{color:var(--muted);background:#f1e8de}
-.cuerpo{padding:4px 12px 14px;border-top:1px solid var(--line)}
-.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.th{position:relative;width:84px;height:84px;border-radius:10px;overflow:hidden;background:#eee}
-.th img{width:100%;height:100%;object-fit:cover}
-.th button{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:16px;line-height:1;cursor:pointer}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid #d8c4b0;background:#fff;color:var(--ink);font:600 15px "DM Sans",sans-serif;cursor:pointer;text-decoration:none}
-.btn:hover{border-color:var(--gold)}
-.btn.main{background:var(--red);border-color:var(--red);color:#fff}
-.btn.dark{background:var(--night);border-color:var(--night);color:#fff}
-.file{position:relative;overflow:hidden}
-.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.acciones{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.vid{margin-top:8px;font-size:14px;color:var(--muted)}
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(10,23,38,.96);color:#fff;padding:12px max(4vw,16px) calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
-.bar .prog{flex:1 1 180px;max-width:300px;font-size:14px}
-.bar .track{height:6px;border-radius:3px;background:#2a4360;margin-top:5px;overflow:hidden}
-.bar .fill{height:100%;background:var(--gold);width:0;transition:width .3s}
-.bar .btn{background:#fff;border-color:#fff}
-.bar .btn.main{background:var(--red);border-color:var(--red);color:#fff}
-@media(max-width:560px){.bar .prog{flex-basis:100%;max-width:none}.bar .btn{flex:1}body{padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))}.toast{bottom:calc(140px + env(safe-area-inset-bottom,0px))}}
-.pasos{margin:0;padding-left:22px}
-.pasos li{margin-bottom:8px}
-.aviso{background:#fff4d6;border:1px solid #f0d58a;border-radius:12px;padding:10px 14px;font-size:14px;margin:12px 0}
-.guardado{font-size:13px;color:#9fb6cc}
-.prev{position:fixed;inset:0;z-index:30;background:#000;display:flex;flex-direction:column}
-.prev header{display:flex;justify-content:space-between;align-items:center;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;background:var(--night);color:#fff;font-weight:600}
-.prev iframe{flex:1;border:0;width:100%;background:#0a1726}
-.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;transition:.3s;z-index:40;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
-.toast.show{opacity:1}
+body{background:var(--paper);color:var(--ink);font:16px/1.5 "DM Sans",system-ui,sans-serif;overflow-x:clip}
+.hero{position:relative;background:radial-gradient(120% 90% at 50% 10%,var(--night2),var(--night));color:#fff4ea;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 36px) max(5vw,16px) 40px;overflow:hidden}
+#snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero>*{position:relative}
+.hero img{width:min(58vw,240px);height:auto;border-radius:28px;box-shadow:0 18px 50px rgba(0,0,0,.45);display:block;margin:0 auto 18px}
+h1{font:700 clamp(46px,13vw,84px)/1 "Mountains of Christmas",cursive;margin:0}
+.hero p{max-width:30em;margin:10px auto 22px;color:#d6e2ee;font-size:17px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 26px;border-radius:14px;border:1px solid transparent;font:700 17px "DM Sans",sans-serif;cursor:pointer;text-decoration:none}
+.btn.main{background:var(--red);color:#fff;box-shadow:0 8px 24px rgba(200,16,46,.4)}
+.btn.sec{background:transparent;color:#fff4ea;border-color:rgba(255,255,255,.35);font-weight:600;font-size:15px;min-height:46px}
+.btn.peq{min-height:40px;padding:0 14px;font-size:14px;border-color:#d8c4b0;background:#fff;color:var(--ink);font-weight:600}
+.acciones{display:flex;flex-direction:column;align-items:center;gap:10px}
+.acciones .main{width:min(100%,340px)}
+main{max-width:720px;margin:0 auto;padding:8px max(4vw,16px) calc(40px + env(safe-area-inset-bottom,0px))}
+h2{font:700 30px/1.1 "Mountains of Christmas",cursive;color:var(--green);margin:30px 0 10px}
+.cal{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.cal .ic{flex:0 0 44px;height:44px;border-radius:10px;background:var(--green);display:grid;place-items:center;color:#fff;font:700 20px "Mountains of Christmas",cursive}
+.cal .t{flex:1}
+.cal b{display:block}
+.cal small{color:var(--muted)}
+.cal .bs{display:flex;gap:6px}
+.pasos{display:grid;gap:10px;counter-reset:p;padding:0;margin:0;list-style:none}
+.pasos li{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 14px 14px 58px;position:relative}
+.pasos li::before{counter-increment:p;content:counter(p);position:absolute;left:14px;top:14px;width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;font-weight:700;display:grid;place-items:center}
+.pasos b{display:block}
+.pasos span{color:var(--muted);font-size:15px}
+.nota{font-size:14px;color:var(--muted);margin-top:14px}
+.err{color:var(--red);font-weight:600;min-height:1.5em}
+@media(min-width:760px){.pasos{grid-template-columns:repeat(3,1fr)}.acciones{flex-direction:row;justify-content:center}.acciones .main{width:auto}}
 </style>
 </head>
 <body>
-<div class="top">
-  <img src="logos/icono-256.png" alt="">
+<section class="hero">
+  <canvas id="snow"></canvas>
+  <img src="/logos/icono-512.png" alt="Árbol de corazones">
   <h1>Christmas Love</h1>
-  <p>Crea tu calendario de adviento: 24 ventanas con fotos, mensajes y vídeos. Cada una se abre sola en su día.</p>
-</div>
+  <p>El calendario de adviento para tu pareja. 24 ventanas con fotos, mensajes y vídeos que se abren solas cada día de diciembre.</p>
+  <div class="acciones">
+    <button class="btn main" id="crear" type="button">Crear mi calendario</button>
+    <a class="btn sec" href="/c/demo">Ver un ejemplo</a>
+  </div>
+  <div class="err" id="err" role="status"></div>
+</section>
 
 <main>
-  <h2>1. Para quién es</h2>
-  <p class="hint">Todo se guarda solo en este móvil u ordenador mientras lo rellenas.</p>
-  <div class="box">
-    <div class="row">
-      <div class="field"><label for="para">Para</label><input type="text" id="para" placeholder="Lucía, mi amor…" maxlength="40"></div>
-      <div class="field"><label for="de">De (tu firma)</label><input type="text" id="de" placeholder="Tu nombre" maxlength="40"></div>
-    </div>
-    <div class="field" style="margin:0"><label for="pie">Frase final</label><input type="text" id="pie" maxlength="80"></div>
+  <div id="misBox" hidden>
+    <h2>Mis calendarios</h2>
+    <div id="mis"></div>
+    <p class="nota">Se recuerdan en este móvil. Desde otro dispositivo, usa tu enlace de edición.</p>
   </div>
 
-  <h2>2. Los 24 días</h2>
-  <p class="hint">Toca un día para rellenarlo. Para vídeos largos, súbelos a YouTube como "oculto" y pega el enlace.</p>
-  <div id="dias"></div>
-
-  <h2>3. Publicarlo</h2>
-  <div class="box">
-    <ol class="pasos">
-      <li>Pulsa <b>Descargar</b>. Te baja un archivo <b>index.html</b> con todo dentro.</li>
-      <li>En el ordenador, crea una carpeta (por ejemplo <i>calendario-lucia</i>) y mete el archivo dentro.</li>
-      <li>Entra en <b>app.netlify.com/drop</b>, crea una cuenta gratis y arrastra la carpeta.</li>
-      <li>Copia el enlace que te da y envíaselo. Para verlo tú antes de tiempo, añade <b id="clave"></b> al final del enlace.</li>
-    </ol>
-    <div class="aviso">Para cambiar algo después: vuelve aquí, edita, descarga otra vez y arrástralo en Netlify a "Deploys". El enlace no cambia.</div>
-    <div class="acciones">
-      <button class="btn" id="exportar" type="button">Guardar copia del borrador</button>
-      <span class="btn file">Abrir borrador<input type="file" id="importar" accept=".json,application/json"></span>
-      <button class="btn" id="borrar" type="button">Empezar de cero</button>
-    </div>
-  </div>
+  <h2>Cómo funciona</h2>
+  <ol class="pasos">
+    <li><b>Créalo</b><span>Sin registro. Tienes tu propio calendario al momento.</span></li>
+    <li><b>Rellena los 24 días</b><span>Fotos del carrete, mensajes y vídeos. Se guarda solo.</span></li>
+    <li><b>Compártelo</b><span>Le mandas un enlace por WhatsApp. Cada día se abre una ventana nueva.</span></li>
+  </ol>
 </main>
-
-<div class="bar">
-  <div class="prog"><span id="progt">0 de 24 días listos</span> <span class="guardado" id="guardado"></span><div class="track"><div class="fill" id="fill"></div></div></div>
-  <button class="btn" id="ver" type="button">Vista previa</button>
-  <button class="btn main" id="descargar" type="button">Descargar</button>
-</div>
-<div class="toast" id="toast" role="status"></div>
 
 <script>
 {
-const PLANTILLA = "/*PLANTILLA*/";
-const ICONO = "logos/icono-256.png";
-const ANIO = 2026, MAX_VIDEO = 15 * 1024 * 1024;
 const $ = id => document.getElementById(id);
-const leerArchivo = f => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = ko; r.readAsDataURL(f); });
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const PALABRAS = ['nieve','reno','estrella','turron','abeto','muerdago','galleta','vela','trineo','copo'];
-const nuevo = () => ({para:'', de:'', pie:'Hecho con todo mi cariño', anio:ANIO, clavePrueba: PALABRAS[Math.floor(Math.random()*PALABRAS.length)] + Math.floor(100 + Math.random()*900), dias:Object.fromEntries(Array.from({length:24}, (_, i) => [i+1, {titulo:'', texto:'', fotos:[], video:''}]))});
-let S = nuevo();
-
-/* guardado en el navegador (IndexedDB, aguanta fotos) */
-let db = null;
-function abrirDB() { return new Promise(r => { try { const q = indexedDB.open('christmas-love', 1); q.onupgradeneeded = () => q.result.createObjectStore('b'); q.onsuccess = () => r(q.result); q.onerror = () => r(null); } catch (e) { r(null); } }); }
-function leer() { return new Promise(r => { if (!db) return r(null); try { const q = db.transaction('b').objectStore('b').get('borrador'); q.onsuccess = () => r(q.result || null); q.onerror = () => r(null); } catch (e) { r(null); } }); }
-let tGuardar;
-function guardar() { clearTimeout(tGuardar); $('guardado').textContent = ''; tGuardar = setTimeout(() => { if (!db) return; try { const tx = db.transaction('b', 'readwrite'); tx.objectStore('b').put(S, 'borrador'); tx.oncomplete = () => $('guardado').textContent = '· guardado'; } catch (e) {} }, 500); }
-
-function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2600); }
-const listo = d => !!(d.titulo.trim() || d.texto.trim() || d.fotos.length || d.video);
-function resumen(d) { const p = []; if (d.fotos.length) p.push(d.fotos.length + (d.fotos.length > 1 ? ' fotos' : ' foto')); if (d.video) p.push('vídeo'); if (d.texto.trim()) p.push('texto'); return p.join(' · ') || 'Vacío'; }
-function mb() { return (JSON.stringify(S).length / 1048576).toFixed(1).replace('.', ','); }
-
-function progreso() {
-  const n = Object.values(S.dias).filter(listo).length;
-  $('progt').textContent = n + ' de 24 días listos · ' + mb() + ' MB';
-  $('fill').style.width = (n / 24 * 100) + '%';
+let mis = []; try { mis = JSON.parse(localStorage.getItem('cl-mis') || '[]'); } catch (e) {}
+mis = mis.filter(x => x && /^[a-z0-9]{8}$/.test(x.id) && x.token);
+if (mis.length) {
+  $('misBox').hidden = false;
+  $('mis').innerHTML = mis.map(x => `<div class="cal"><span class="ic">♥</span><span class="t"><b>${esc(x.para ? 'Para ' + x.para : 'Sin nombre todavía')}</b><small>Creado el ${new Date(x.creado || Date.now()).toLocaleDateString('es-ES', {day: 'numeric', month: 'long'})}</small></span><span class="bs"><a class="btn peq" href="/editar/${x.id}">Editar</a></span></div>`).join('');
+  $('crear').textContent = 'Crear otro calendario';
 }
-function pintarCab(n) {
-  const d = S.dias[n], el = document.querySelector(`details[data-n="${n}"]`); if (!el) return;
-  el.querySelector('.st b').textContent = d.titulo.trim() || 'Día ' + n;
-  el.querySelector('.st small').textContent = resumen(d);
-  const ok = el.querySelector('.ok'); ok.textContent = listo(d) ? 'Listo' : 'Pendiente'; ok.classList.toggle('vacio', !listo(d));
-}
-function pintarFotos(n) {
-  const el = document.querySelector(`details[data-n="${n}"] .thumbs`);
-  el.innerHTML = S.dias[n].fotos.map((f, i) => `<div class="th"><img src="${esc(f)}" alt="Foto ${i+1}"><button type="button" data-quitar="${i}" aria-label="Quitar foto">×</button></div>`).join('');
-}
-function pintarVideo(n) {
-  const v = S.dias[n].video, el = document.querySelector(`details[data-n="${n}"] .vid`);
-  el.innerHTML = v.startsWith('data:') ? 'Vídeo subido (' + (v.length * .75 / 1048576).toFixed(1).replace('.', ',') + ' MB) · <button type="button" class="btn" data-quitarvid style="min-height:32px;padding:0 10px">Quitar</button>' : '';
-}
-function pintar() {
-  $('para').value = S.para; $('de').value = S.de; $('pie').value = S.pie;
-  $('clave').textContent = '?prueba=' + S.clavePrueba;
-  $('dias').innerHTML = Array.from({length:24}, (_, i) => i + 1).map(n => {
-    const d = S.dias[n], yt = d.video.startsWith('data:') ? '' : d.video;
-    return `<details class="dia d${n % 4}" data-n="${n}">
-      <summary><span class="n">${n}</span><span class="st"><b></b><small></small></span><span class="ok"></span></summary>
-      <div class="cuerpo">
-        <div class="field"><label for="t${n}">Título</label><input type="text" id="t${n}" data-k="titulo" maxlength="60" value="${esc(d.titulo)}" placeholder="Ej: Nuestra primera cita"></div>
-        <div class="field"><label for="x${n}">Mensaje</label><textarea id="x${n}" data-k="texto" placeholder="Escribe lo que quieras que lea ese día">${esc(d.texto)}</textarea></div>
-        <label>Fotos</label>
-        <div class="thumbs"></div>
-        <span class="btn file">Añadir fotos<input type="file" accept="image/*" multiple data-fotos></span>
-        <div class="field" style="margin-top:14px"><label for="v${n}">Vídeo de YouTube (enlace)</label><input type="url" id="v${n}" data-k="video" value="${esc(yt)}" placeholder="https://youtu.be/…"></div>
-        <span class="btn file">O subir un vídeo corto (máx. 15 MB)<input type="file" accept="video/mp4,video/quicktime,video/*" data-video></span>
-        <div class="vid"></div>
-      </div>
-    </details>`;
-  }).join('');
-  for (let n = 1; n <= 24; n++) { pintarCab(n); pintarFotos(n); pintarVideo(n); }
-  progreso();
-}
-
-function comprimir(file) {
-  return new Promise((ok, ko) => {
-    const url = URL.createObjectURL(file), im = new Image();
-    im.onload = () => {
-      const M = 1400, k = Math.min(1, M / Math.max(im.naturalWidth, im.naturalHeight));
-      const c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
-      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
-      ok(c.toDataURL('image/jpeg', .82));
-    };
-    im.onerror = () => { URL.revokeObjectURL(url); ko(); };
-    im.src = url;
-  });
-}
-
-['para', 'de', 'pie'].forEach(k => $(k).addEventListener('input', e => { S[k] = e.target.value; guardar(); }));
-$('dias').addEventListener('input', e => {
-  const k = e.target.dataset.k; if (!k) return;
-  const n = +e.target.closest('details').dataset.n; S.dias[n][k] = e.target.value.trim() && k === 'video' ? e.target.value.trim() : e.target.value;
-  if (k === 'video') pintarVideo(n);
-  pintarCab(n); progreso(); guardar();
-});
-$('dias').addEventListener('change', async e => {
-  const n = +e.target.closest('details')?.dataset.n; if (!n) return;
-  if (e.target.matches('[data-fotos]')) {
-    const files = [...e.target.files]; e.target.value = ''; let fallo = 0;
-    toast('Preparando ' + files.length + (files.length > 1 ? ' fotos…' : ' foto…'));
-    for (const f of files) { try { S.dias[n].fotos.push(await comprimir(f)); } catch (er) { fallo++; } }
-    pintarFotos(n); pintarCab(n); progreso(); guardar();
-    toast(fallo ? fallo + ' foto(s) no se pudieron leer. Prueba en JPG.' : 'Fotos añadidas');
-  }
-  if (e.target.matches('[data-video]')) {
-    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-    if (f.size > MAX_VIDEO) { toast('Ocupa ' + (f.size / 1048576).toFixed(0) + ' MB. Súbelo a YouTube y pega el enlace.'); return; }
-    S.dias[n].video = await leerArchivo(f); document.getElementById('v' + n).value = '';
-    pintarVideo(n); pintarCab(n); progreso(); guardar(); toast('Vídeo añadido');
-  }
-});
-$('dias').addEventListener('click', e => {
-  const n = +e.target.closest('details')?.dataset.n; if (!n) return;
-  if (e.target.dataset.quitar !== undefined) { S.dias[n].fotos.splice(+e.target.dataset.quitar, 1); pintarFotos(n); }
-  else if (e.target.hasAttribute('data-quitarvid')) { S.dias[n].video = ''; pintarVideo(n); }
-  else return;
-  pintarCab(n); progreso(); guardar();
-});
-
-let TPL = null, ICONO_DATA = ICONO.startsWith('data:') ? ICONO : ICONO;
-if (!PLANTILLA.startsWith('/*')) TPL = new TextDecoder().decode(Uint8Array.from(atob(PLANTILLA), c => c.charCodeAt(0)));
-else fetch('calendario.html').then(r => r.text()).then(t => TPL = t).catch(() => {});
-if (!ICONO.startsWith('data:')) fetch(ICONO).then(r => r.blob()).then(b => leerArchivo(b)).then(d => ICONO_DATA = d).catch(() => {});
-function plantilla() { if (!TPL) { toast('Cargando, prueba en un segundo'); throw new Error('sin plantilla'); } return TPL; }
-function generar(prueba) {
-  const datos = Object.assign({}, S, {modoPrueba: !!prueba});
-  const json = JSON.stringify(datos).replace(/</g, '\\u003c').replace(/[\u2028\u2029]/g, '');
-  return plantilla().split('<script src="contenido.js"><\/script>').join('<script>window.CHRISTMAS_LOVE=' + json + ';<\/script>').split('logos/icono-256.png').join(ICONO_DATA);
-}
-$('ver').onclick = () => {
-  const p = document.createElement('div'); p.className = 'prev';
-  p.innerHTML = '<header><span>Vista previa (todo abierto)</span><button class="btn" type="button">Cerrar</button></header>';
-  const fr = document.createElement('iframe'); fr.title = 'Vista previa'; fr.srcdoc = generar(true); p.appendChild(fr);
-  p.querySelector('button').onclick = () => p.remove(); document.body.appendChild(p);
+$('crear').onclick = async e => {
+  const b = e.currentTarget; b.disabled = true; b.textContent = 'Creando…'; $('err').textContent = '';
+  try {
+    const r = await fetch('/api/crear', {method: 'POST'}); const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    try { const l = JSON.parse(localStorage.getItem('cl-mis') || '[]'); l.unshift({id: d.id, token: d.token, creado: Date.now()}); localStorage.setItem('cl-mis', JSON.stringify(l)); } catch (er) {}
+    location.href = '/editar/' + d.id + '#t=' + d.token;
+  } catch (er) { $('err').textContent = 'No se pudo crear. Prueba otra vez.'; b.disabled = false; b.textContent = 'Crear mi calendario'; }
 };
-function bajar(nombre, contenido, tipo) {
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([contenido], {type: tipo})); a.download = nombre;
-  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-}
-$('descargar').onclick = () => {
-  const vacios = Object.values(S.dias).filter(d => !listo(d)).length;
-  bajar('index.html', generar(false), 'text/html');
-  toast(vacios ? 'Descargado. Ojo: quedan ' + vacios + ' días vacíos.' : 'Descargado. Ahora súbelo a Netlify (paso 3).');
-};
-$('exportar').onclick = () => { bajar('christmas-love-borrador.json', JSON.stringify(S), 'application/json'); toast('Copia guardada'); };
-$('importar').onchange = async e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try { const d = JSON.parse(await f.text()); if (!d.dias) throw 0; S = Object.assign(nuevo(), d); pintar(); guardar(); toast('Borrador abierto'); }
-  catch (er) { toast('Ese archivo no es un borrador válido'); }
-};
-let armado = 0;
-$('borrar').onclick = e => {
-  if (Date.now() - armado > 4000) { armado = Date.now(); e.target.textContent = 'Pulsa otra vez para borrar todo'; setTimeout(() => e.target.textContent = 'Empezar de cero', 4000); return; }
-  S = nuevo(); pintar(); guardar(); e.target.textContent = 'Empezar de cero'; toast('Borrador vacío');
-};
-
-(async () => { db = await abrirDB(); const b = await leer(); if (b && b.dias) S = Object.assign(nuevo(), b); pintar(); })();
+/* nieve */
+const cv = $('snow'), cx = cv.getContext('2d'); let W, H, P = [];
+const motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+function tam() { const r = devicePixelRatio || 1; W = cv.clientWidth; H = cv.clientHeight; cv.width = W * r; cv.height = H * r; cx.setTransform(r, 0, 0, r, 0, 0); P = Array.from({length: Math.round(W * H / 7000)}, () => ({x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2.2 + .6, v: Math.random() * .5 + .25, o: Math.random() * 6})); }
+function f(t) { cx.clearRect(0, 0, W, H); cx.fillStyle = 'rgba(255,255,255,.8)'; for (const p of P) { p.y += p.v; p.x += Math.sin(t / 1500 + p.o) * .3; if (p.y > H + 5) { p.y = -5; p.x = Math.random() * W; } cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill(); } if (motion) requestAnimationFrame(f); }
+addEventListener('resize', tam); tam(); requestAnimationFrame(f);
 }
 </script>
 </body>
