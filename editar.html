@@ -136,7 +136,7 @@ details.dia summary::-webkit-details-marker{display:none}
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ID = location.pathname.split('/').filter(Boolean).pop() || '';
-const MAX_FOTOS = 6, MAX_VIDEO = 4.3 * 1024 * 1024;
+const MAX_FOTOS = 6, MAX_DIRECTO = 4 * 1024 * 1024, MAX_VIDEO = 150 * 1024 * 1024;
 
 /* mis calendarios en este dispositivo */
 const mis = () => { try { return JSON.parse(localStorage.getItem('cl-mis') || '[]'); } catch (e) { return []; } };
@@ -204,7 +204,7 @@ function pintar() {
         <span class="btn file verde" style="width:100%">Añadir fotos<input type="file" accept="image/*" multiple data-fotos aria-label="Añadir fotos del día ${n}"></span>
         <div class="o">vídeo (opcional)</div>
         <div class="field"><label for="v${n}">Enlace de YouTube</label><input type="url" id="v${n}" data-k="video" value="${esc(yt)}" placeholder="https://youtu.be/…" inputmode="url"></div>
-        <span class="btn file" style="width:100%">O subir un vídeo corto (máx. 4 MB)<input type="file" accept="video/*" data-video aria-label="Subir vídeo del día ${n}"></span>
+        <span class="btn file" style="width:100%">O subir un vídeo del carrete (máx. 150 MB)<input type="file" accept="video/*" data-video aria-label="Subir vídeo del día ${n}"></span>
         <div class="vid"></div>
       </div>
     </details>`;
@@ -255,10 +255,24 @@ $('dias').addEventListener('change', async e => {
   }
   if (e.target.matches('[data-video]')) {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-    if (f.size > MAX_VIDEO) { toast('Pesa ' + (f.size / 1048576).toFixed(0) + ' MB. Súbelo a YouTube como oculto y pega el enlace.', true); return; }
-    toast('Subiendo vídeo…');
-    try { S.dias[n].video = await subir(f, f.type || 'video/mp4'); $('v' + n).value = ''; pintarVideo(n); pintarCab(n); progreso(); guardar(); toast('Vídeo añadido'); }
-    catch (er) { toast(er.message || 'No se pudo subir el vídeo', true); }
+    if (f.size > MAX_VIDEO) { toast('Pesa ' + (f.size / 1048576).toFixed(0) + ' MB (máx. 150). Recórtalo o súbelo a YouTube como oculto.', true); return; }
+    const vid = caja(n).querySelector('.vid');
+    vid.textContent = 'Subiendo vídeo… 0%';
+    try {
+      let url;
+      if (f.size <= MAX_DIRECTO) url = await subir(f, f.type || 'video/mp4');
+      else {
+        const { upload } = await import('/vendor/blob-client.js');
+        const ext = (f.name.match(/\.[a-z0-9]{2,4}$/i) || ['.mp4'])[0].toLowerCase();
+        const r = await upload(`cal/${ID}/video${ext}`, f, {
+          access: 'public', handleUploadUrl: '/api/subir', contentType: f.type || 'video/mp4', multipart: f.size > 20 * 1024 * 1024,
+          clientPayload: JSON.stringify({id: ID, token: TOKEN}),
+          onUploadProgress: e => { vid.textContent = 'Subiendo vídeo… ' + Math.round(e.percentage) + '%'; },
+        });
+        url = r.url;
+      }
+      S.dias[n].video = url; $('v' + n).value = ''; pintarVideo(n); pintarCab(n); progreso(); guardar(); toast('Vídeo añadido');
+    } catch (er) { pintarVideo(n); toast('No se pudo subir el vídeo. Prueba con wifi o uno más corto.', true); }
   }
 });
 $('dias').addEventListener('click', e => {
